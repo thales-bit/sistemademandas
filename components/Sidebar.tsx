@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Ambiente } from "@/lib/ambiente";
 
 const itens = [
   { href: "/", label: "Painel", icon: "▣" },
@@ -11,7 +12,7 @@ const itens = [
   { href: "/portal", label: "Portal do Cliente", icon: "◎" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ ambiente }: { ambiente: Ambiente }) {
   const path = usePathname();
 
   return (
@@ -47,8 +48,9 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto border-t border-brand-800 px-5 py-4 text-xs text-brand-400">
-        Protótipo navegável · v0.1
+      <div className="mt-auto space-y-2 border-t border-brand-800 px-5 py-4">
+        <span className={`badge ${ambiente.cor}`}>{ambiente.label}</span>
+        <div className="text-xs text-brand-400">Protótipo navegável · v0.1</div>
       </div>
     </aside>
   );
