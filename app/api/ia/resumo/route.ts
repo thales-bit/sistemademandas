@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getDemanda } from "@/lib/data";
+import { getDemandaById } from "@/lib/db";
 import { gerarResumo } from "@/lib/anthropic";
 
 export async function POST(req: Request) {
   const { demandaId } = await req.json();
-  const demanda = getDemanda(demandaId);
+  const demanda = await getDemandaById(demandaId);
   if (!demanda) {
     return NextResponse.json({ erro: "Demanda não encontrada" }, { status: 404 });
   }

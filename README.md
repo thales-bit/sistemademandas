@@ -39,6 +39,26 @@ cp .env.example .env.local
 # edite .env.local e preencha ANTHROPIC_API_KEY
 ```
 
+### Habilitar o banco de dados (Supabase)
+
+Sem configuração, o sistema usa **dados de exemplo em memória**. Para gravar de
+verdade:
+
+1. Crie um projeto grátis em [supabase.com](https://supabase.com) (região
+   *South America (São Paulo)* é a mais rápida).
+2. No **SQL Editor** do Supabase, cole e rode o arquivo `supabase/schema.sql`
+   (cria as tabelas e insere os dados de exemplo).
+3. Em **Project Settings → API**, copie a *Project URL* e a *service_role key*.
+4. Cadastre as variáveis (no `.env.local` para rodar local, e nas *Environment
+   Variables* da Vercel para produção):
+
+   ```
+   SUPABASE_URL=...
+   SUPABASE_SERVICE_ROLE_KEY=...   # secreta — só no servidor
+   ```
+
+A partir daí, todas as telas passam a ler/gravar no Supabase automaticamente.
+
 ## Stack
 
 - **Next.js 14** (App Router) + **React 18** + **TypeScript**

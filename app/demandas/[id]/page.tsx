@@ -3,14 +3,20 @@ import { notFound } from "next/navigation";
 import Topbar from "@/components/Topbar";
 import { StatusDemandaBadge, StatusCobrancaBadge } from "@/components/Badges";
 import PainelIA from "@/components/PainelIA";
-import { getDemanda, getCliente, cobrancas } from "@/lib/data";
+import { getDemandaById, getClientes, getCobrancas } from "@/lib/db";
 import { brl, dataBR } from "@/lib/format";
 
-export default function DemandaDetalhe({ params }: { params: { id: string } }) {
-  const d = getDemanda(params.id);
+export const dynamic = "force-dynamic";
+
+export default async function DemandaDetalhe({ params }: { params: { id: string } }) {
+  const [d, clientes, cobrancas] = await Promise.all([
+    getDemandaById(params.id),
+    getClientes(),
+    getCobrancas(),
+  ]);
   if (!d) notFound();
 
-  const cliente = getCliente(d.clienteId);
+  const cliente = clientes.find((c) => c.id === d.clienteId);
   const cobrancasDemanda = cobrancas.filter((c) => c.demandaId === d.id);
 
   return (

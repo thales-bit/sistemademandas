@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Topbar from "@/components/Topbar";
 import { StatusDemandaBadge, StatusCobrancaBadge } from "@/components/Badges";
-import { clientes, demandas, cobrancas, nomeCliente } from "@/lib/data";
+import { getClientes, getDemandas, getCobrancas, mapaNomesClientes } from "@/lib/db";
 import { brl, dataBR, diasAte } from "@/lib/format";
+
+export const dynamic = "force-dynamic";
 
 function Stat({ label, valor, hint, tom }: { label: string; valor: string; hint?: string; tom?: string }) {
   return (
@@ -14,7 +16,15 @@ function Stat({ label, valor, hint, tom }: { label: string; valor: string; hint?
   );
 }
 
-export default function Painel() {
+export default async function Painel() {
+  const [clientes, demandas, cobrancas, nomes] = await Promise.all([
+    getClientes(),
+    getDemandas(),
+    getCobrancas(),
+    mapaNomesClientes(),
+  ]);
+  const nomeCliente = (id: string) => nomes[id] ?? "—";
+
   const demandasAtivas = demandas.filter((d) => d.status !== "Concluída" && d.status !== "Arquivada");
   const emAberto = cobrancas.filter((c) => c.status !== "Paga");
   const totalAberto = emAberto.reduce((s, c) => s + c.valor, 0);

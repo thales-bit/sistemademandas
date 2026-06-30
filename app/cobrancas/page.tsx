@@ -1,7 +1,9 @@
 import Topbar from "@/components/Topbar";
 import { StatusCobrancaBadge } from "@/components/Badges";
-import { cobrancas, nomeCliente, getDemanda } from "@/lib/data";
+import { getCobrancas, getDemandas, mapaNomesClientes } from "@/lib/db";
 import { brl, dataBR, diasAte } from "@/lib/format";
+
+export const dynamic = "force-dynamic";
 
 function Stat({ label, valor, tom, hint }: { label: string; valor: string; tom?: string; hint?: string }) {
   return (
@@ -13,7 +15,15 @@ function Stat({ label, valor, tom, hint }: { label: string; valor: string; tom?:
   );
 }
 
-export default function CobrancasPage() {
+export default async function CobrancasPage() {
+  const [cobrancas, demandas, nomes] = await Promise.all([
+    getCobrancas(),
+    getDemandas(),
+    mapaNomesClientes(),
+  ]);
+  const nomeCliente = (id: string) => nomes[id] ?? "—";
+  const demandaPorId = (id?: string) => (id ? demandas.find((d) => d.id === id) : undefined);
+
   const recebido = cobrancas.filter((c) => c.status === "Paga").reduce((s, c) => s + c.valor, 0);
   const aberto = cobrancas.filter((c) => c.status === "Em aberto").reduce((s, c) => s + c.valor, 0);
   const atrasado = cobrancas.filter((c) => c.status === "Atrasada").reduce((s, c) => s + c.valor, 0);
@@ -57,7 +67,7 @@ export default function CobrancasPage() {
             <tbody className="divide-y divide-slate-100">
               {ordenadas.map((c) => {
                 const dias = diasAte(c.vencimento);
-                const dem = c.demandaId ? getDemanda(c.demandaId) : undefined;
+                const dem = demandaPorId(c.demandaId);
                 return (
                   <tr key={c.id} className="hover:bg-slate-50">
                     <td className="px-5 py-3">

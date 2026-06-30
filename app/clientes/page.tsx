@@ -1,8 +1,15 @@
 import Topbar from "@/components/Topbar";
-import { clientes, getDemandasDoCliente, getCobrancasDoCliente } from "@/lib/data";
+import { getClientes, getDemandas, getCobrancas } from "@/lib/db";
 import { brl, dataBR } from "@/lib/format";
 
-export default function ClientesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ClientesPage() {
+  const [clientes, demandas, cobrancas] = await Promise.all([
+    getClientes(),
+    getDemandas(),
+    getCobrancas(),
+  ]);
   return (
     <>
       <Topbar titulo="Clientes" subtitulo={`${clientes.length} clientes cadastrados`} />
@@ -26,9 +33,9 @@ export default function ClientesPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {clientes.map((c) => {
-                const dems = getDemandasDoCliente(c.id);
-                const aberto = getCobrancasDoCliente(c.id)
-                  .filter((x) => x.status !== "Paga")
+                const dems = demandas.filter((d) => d.clienteId === c.id);
+                const aberto = cobrancas
+                  .filter((x) => x.clienteId === c.id && x.status !== "Paga")
                   .reduce((s, x) => s + x.valor, 0);
                 return (
                   <tr key={c.id} className="hover:bg-slate-50">

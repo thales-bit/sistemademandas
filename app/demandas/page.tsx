@@ -1,10 +1,14 @@
 import Link from "next/link";
 import Topbar from "@/components/Topbar";
 import { StatusDemandaBadge } from "@/components/Badges";
-import { demandas, nomeCliente } from "@/lib/data";
+import { getDemandas, mapaNomesClientes } from "@/lib/db";
 import { dataBR, diasAte } from "@/lib/format";
 
-export default function DemandasPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DemandasPage() {
+  const [demandas, nomes] = await Promise.all([getDemandas(), mapaNomesClientes()]);
+  const nomeCliente = (id: string) => nomes[id] ?? "—";
   return (
     <>
       <Topbar titulo="Demandas" subtitulo={`${demandas.length} demandas`} />
