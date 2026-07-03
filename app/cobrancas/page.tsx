@@ -9,7 +9,7 @@ function Stat({ label, valor, tom, hint }: { label: string; valor: string; tom?:
   return (
     <div className="card p-5">
       <div className="text-sm text-slate-500">{label}</div>
-      <div className={`mt-1 text-2xl font-semibold ${tom ?? "text-brand-900"}`}>{valor}</div>
+      <div className={`mono mt-1 text-2xl ${tom ?? "text-brand-900"}`}>{valor}</div>
       {hint && <div className="mt-1 text-xs text-slate-400">{hint}</div>}
     </div>
   );
@@ -89,7 +89,7 @@ export default async function CobrancasPage() {
                         <div className="text-xs text-emerald-600">pago em {dataBR(c.pagoEm)}</div>
                       )}
                     </td>
-                    <td className="px-5 py-3 text-right font-semibold text-brand-900">{brl(c.valor)}</td>
+                    <td className="mono px-5 py-3 text-right font-semibold text-brand-900">{brl(c.valor)}</td>
                     <td className="px-5 py-3">
                       <StatusCobrancaBadge status={c.status} />
                     </td>

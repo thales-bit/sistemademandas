@@ -2,45 +2,151 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+   Tema "Gelo Diário" — claro/frio, acento gelo profundo, tipografia serifada
+   nos títulos, grotesca no corpo e mono nos números.
+   ========================================================================== */
 :root {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bg: #F1F5F8;
+  --surface: #FFFFFF;
+  --surface-alt: #E9EFF4;
+  --border: #D8E1E9;
+  --text: #131A21;
+  --muted: #64707C;
+  --accent: #0A6F8E;        /* ciano profundo — textos, botões, navegação */
+  --accent-bright: #45BEE0; /* gelo brilhante — só na linha de luz e brilho */
+  --accent-soft: #E1F2F8;
+  --on-accent: #FFFFFF;
+  --positive: #2E8B63;
+  --warning: #B07C1E;
+  --danger: #C24A3E;
+
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
-html,
+* { box-sizing: border-box; }
+html, body { padding: 0; margin: 0; }
 body {
-  padding: 0;
-  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
 }
 
-body {
-  background-color: #f6f7f9;
-  color: #1d2f44;
-}
-
-* {
-  box-sizing: border-box;
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  font-weight: 600;
 }
 
 @layer components {
   .card {
-    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
   }
   .badge {
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border-radius: 999px;
+    padding: 0.18rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 500;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, filter 0.15s ease, color 0.15s ease;
   }
   .btn-primary {
-    @apply btn bg-brand-700 text-white hover:bg-brand-800;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: 0;
   }
+  .btn-primary:hover { filter: brightness(1.06); }
   .btn-ghost {
-    @apply btn border border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
   }
+  .btn-ghost:hover { background: var(--surface-alt); }
   .input {
-    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .label {
-    @apply mb-1 block text-sm font-medium text-slate-600;
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted);
   }
 }
+
+/* Números com cara de instrumento (tabulares, alinhados) */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Eyebrow / rótulos de seção */
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* A "linha de luz" (streak) no topo de painéis-chave — um por tela */
+.streak { position: relative; }
+.streak::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--accent-bright) 75%, transparent) 50%,
+    transparent
+  );
+}
+
+/* Brilho gelo sutil atrás do número-herói */
+.hero-glow { position: relative; overflow: hidden; }
+.hero-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 120% at 22% 0%,
+    color-mix(in srgb, var(--accent-bright) 14%, transparent),
+    transparent 60%
+  );
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Demanda } from "./types";
-import { getCliente } from "./data";
+import { getCliente, getDemandasDoCliente } from "./data";
 
 // Modelo da Claude usado pelo assistente jurídico.
 const MODELO = "claude-opus-4-8";
@@ -78,6 +78,51 @@ export async function gerarMinuta(d: Demanda, tipo: string): Promise<string> {
     return minutaSimulada(d, tipo);
   }
   return texto;
+}
+
+export async function gerarKitBoasVindas(clienteId: string): Promise<string> {
+  const cliente = getCliente(clienteId);
+  if (!cliente) return "Cliente não encontrado.";
+  const demandas = getDemandasDoCliente(clienteId);
+  const contexto = [
+    `Cliente: ${cliente.nome} (${cliente.tipo})`,
+    `Contato: ${cliente.email} · ${cliente.telefone}`,
+    demandas.length
+      ? `Demandas: ${demandas.map((d) => `${d.titulo} (${d.area})`).join("; ")}`
+      : "Sem demandas cadastradas ainda.",
+  ].join("\n");
+
+  const system =
+    "Você é um assistente de um escritório de advocacia brasileiro. " +
+    "Escreva uma mensagem de BOAS-VINDAS calorosa e profissional para um cliente que acabou de fechar, " +
+    "pronta para enviar por WhatsApp ou e-mail. Em português, tom acolhedor e sério. " +
+    "Inclua: agradecimento, o que esperar dos próximos passos, reforço de sigilo/transparência, " +
+    "canais de contato e menção ao portal do cliente. Seja conciso (até ~180 palavras). " +
+    "Use [colchetes] onde faltar informação.";
+
+  const texto = await chamar(system, `Escreva o kit de boas-vindas para:\n\n${contexto}`);
+  if (texto.startsWith("[modo simulado")) {
+    return kitSimulado(cliente.nome);
+  }
+  return texto;
+}
+
+function kitSimulado(nome: string): string {
+  return [
+    `Olá, ${nome}! Seja muito bem-vindo(a) à SWZ Advogados. 🤝`,
+    "",
+    "É uma satisfação ter você conosco. A partir de agora, cuidaremos da sua demanda com total dedicação, sigilo e transparência.",
+    "",
+    "Próximos passos:",
+    "• Você receberá acesso ao seu portal, onde acompanha tudo em um só lugar (demandas, documentos e cobranças).",
+    "• Em breve, agendaremos uma breve reunião de alinhamento do seu caso.",
+    "• Qualquer dúvida, fale com a gente pelo WhatsApp [número] ou por e-mail [e-mail].",
+    "",
+    "Conte conosco. Estamos à disposição!",
+    "— Equipe SWZ Advogados",
+    "",
+    "[Mensagem de exemplo — configure a ANTHROPIC_API_KEY para a IA personalizar cada kit.]",
+  ].join("\n");
 }
 
 function minutaSimulada(d: Demanda, tipo: string): string {

@@ -10,7 +10,7 @@ function Stat({ label, valor, hint, tom }: { label: string; valor: string; hint?
   return (
     <div className="card p-5">
       <div className="text-sm text-slate-500">{label}</div>
-      <div className={`mt-1 text-2xl font-semibold ${tom ?? "text-brand-900"}`}>{valor}</div>
+      <div className={`mono mt-1 text-2xl ${tom ?? "text-brand-900"}`}>{valor}</div>
       {hint && <div className="mt-1 text-xs text-slate-400">{hint}</div>}
     </div>
   );
@@ -30,6 +30,8 @@ export default async function Painel() {
   const totalAberto = emAberto.reduce((s, c) => s + c.valor, 0);
   const atrasadas = cobrancas.filter((c) => c.status === "Atrasada");
   const totalAtrasado = atrasadas.reduce((s, c) => s + c.valor, 0);
+  const recebido = cobrancas.filter((c) => c.status === "Paga").reduce((s, c) => s + c.valor, 0);
+  const totalReceber = totalAberto; // aberto já inclui atrasadas
 
   // Prazos próximos (demandas com prazo nos próximos 30 dias)
   const prazos = demandas
@@ -40,11 +42,29 @@ export default async function Painel() {
     <>
       <Topbar titulo="Painel" subtitulo="Visão geral do escritório" />
       <div className="flex-1 space-y-6 p-8">
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <Stat label="Clientes ativos" valor={String(clientes.length)} />
-          <Stat label="Demandas em andamento" valor={String(demandasAtivas.length)} hint={`${demandas.length} no total`} />
-          <Stat label="Em aberto a receber" valor={brl(totalAberto)} hint={`${emAberto.length} cobranças`} />
-          <Stat label="Em atraso" valor={brl(totalAtrasado)} hint={`${atrasadas.length} cobranças`} tom="text-red-600" />
+        <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr]">
+          {/* número-herói */}
+          <div className="card streak hero-glow p-7">
+            <div className="eyebrow">Total a receber</div>
+            <div className="mono mt-3 text-4xl leading-none" style={{ color: "var(--text)" }}>
+              {brl(totalReceber)}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs" style={{ color: "var(--muted)" }}>
+              <span>
+                Recebido: <b className="mono" style={{ color: "var(--text)" }}>{brl(recebido)}</b>
+              </span>
+              <span>
+                Em atraso: <b className="mono" style={{ color: "var(--danger)" }}>{brl(totalAtrasado)}</b>
+              </span>
+            </div>
+          </div>
+          {/* KPIs */}
+          <div className="grid grid-cols-2 gap-4">
+            <Stat label="Clientes ativos" valor={String(clientes.length)} />
+            <Stat label="Demandas em andamento" valor={String(demandasAtivas.length)} hint={`${demandas.length} no total`} />
+            <Stat label="Em aberto" valor={brl(totalAberto - totalAtrasado)} hint={`${emAberto.length - atrasadas.length} cobranças`} />
+            <Stat label="Em atraso" valor={brl(totalAtrasado)} hint={`${atrasadas.length} cobranças`} tom="text-red-600" />
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">

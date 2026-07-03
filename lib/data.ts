@@ -226,3 +226,15 @@ export function getCobrancasDoCliente(clienteId: string) {
 export function nomeCliente(clienteId: string) {
   return getCliente(clienteId)?.nome ?? "—";
 }
+
+// Jornada de Boas-vindas: passo atual de cada cliente (1..6, 7 = concluída)
+export const jornadas: { clienteId: string; passoAtual: number }[] = [
+  { clienteId: "cli-001", passoAtual: 6 },
+  { clienteId: "cli-002", passoAtual: 4 },
+  { clienteId: "cli-003", passoAtual: 5 },
+  { clienteId: "cli-004", passoAtual: 7 },
+];
+
+export function getPassoAtual(clienteId: string) {
+  return jornadas.find((j) => j.clienteId === clienteId)?.passoAtual ?? 1;
+}

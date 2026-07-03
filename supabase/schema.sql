@@ -9,6 +9,7 @@
 -- ============================================================================
 
 -- Limpa versões anteriores (ordem respeita as dependências/foreign keys)
+drop table if exists boas_vindas cascade;
 drop table if exists cobrancas cascade;
 drop table if exists arquivos cascade;
 drop table if exists andamentos cascade;
@@ -93,6 +94,16 @@ create table cobrancas (
 create index on cobrancas (cliente_id);
 create index on cobrancas (demanda_id);
 
+-- ----------------------------------------------------------------------------
+-- Jornada de Boas-vindas (passo atual do onboarding de cada cliente)
+-- passo_atual: 1..6 (7 = jornada concluída)
+-- ----------------------------------------------------------------------------
+create table boas_vindas (
+  cliente_id text primary key references clientes(id) on delete cascade,
+  passo_atual integer not null default 1 check (passo_atual between 1 and 7),
+  atualizado_em timestamptz not null default now()
+);
+
 -- ============================================================================
 -- SEED — dados de exemplo (os mesmos do protótipo)
 -- ============================================================================
@@ -145,6 +156,12 @@ insert into cobrancas (id, cliente_id, demanda_id, descricao, valor, parcela, to
   ('cob-004', 'cli-003', 'dem-1003', 'Consultoria — revisão contratual (mensal)',        12000, 3, 6, '2026-07-05', 'Em aberto', null),
   ('cob-005', 'cli-004', 'dem-1004', 'Honorários — Divórcio consensual',                 4500,  1, 1, '2025-05-20', 'Paga',      '2025-05-18'),
   ('cob-006', 'cli-003', null,       'Consultoria — revisão contratual (mensal)',        12000, 2, 6, '2026-06-05', 'Atrasada',  null);
+
+insert into boas_vindas (cliente_id, passo_atual) values
+  ('cli-001', 6),
+  ('cli-002', 4),
+  ('cli-003', 5),
+  ('cli-004', 7);
 
 -- ============================================================================
 -- Segurança (RLS): por enquanto o acesso é feito pelo servidor com a

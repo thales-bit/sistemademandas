@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import type { Ambiente } from "@/lib/ambiente";
 
 const itens = [
-  { href: "/", label: "Painel", icon: "▣" },
+  { href: "/", label: "Painel", icon: "◧" },
   { href: "/clientes", label: "Clientes", icon: "◍" },
   { href: "/demandas", label: "Demandas", icon: "⚖" },
   { href: "/cobrancas", label: "Cobranças", icon: "₿" },
+  { href: "/boas-vindas", label: "Boas-vindas", icon: "✦" },
   { href: "/portal", label: "Portal do Cliente", icon: "◎" },
 ];
 
@@ -16,18 +17,30 @@ export default function Sidebar({ ambiente }: { ambiente: Ambiente }) {
   const path = usePathname();
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col bg-brand-900 text-brand-100">
+    <aside
+      className="flex w-[232px] shrink-0 flex-col border-r"
+      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
+    >
       <div className="flex items-center gap-3 px-5 py-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold-500 font-bold text-brand-950">
-          SWZ
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-lg font-display text-lg font-semibold"
+          style={{
+            background: "var(--accent)",
+            color: "var(--on-accent)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,.28)",
+          }}
+        >
+          S
         </div>
         <div className="leading-tight">
-          <div className="text-sm font-semibold text-white">SWZ Advogados</div>
-          <div className="text-xs text-brand-300">Gestão de Demandas</div>
+          <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+            SWZ Advogados
+          </div>
+          <div className="eyebrow mt-0.5">Gestão</div>
         </div>
       </div>
 
-      <nav className="mt-2 flex flex-col gap-1 px-3">
+      <nav className="mt-1 flex flex-col gap-0.5 px-3">
         {itens.map((item) => {
           const ativo =
             item.href === "/" ? path === "/" : path.startsWith(item.href);
@@ -35,22 +48,42 @@ export default function Sidebar({ ambiente }: { ambiente: Ambiente }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                ativo
-                  ? "bg-brand-700 font-medium text-white"
-                  : "text-brand-200 hover:bg-brand-800 hover:text-white"
-              }`}
+              className="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition"
+              style={{
+                color: ativo ? "var(--text)" : "var(--muted)",
+                background: ativo ? "var(--surface-alt)" : "transparent",
+              }}
             >
-              <span className="w-5 text-center text-base">{item.icon}</span>
+              {ativo && (
+                <span
+                  className="absolute left-0 top-2.5 bottom-2.5 w-0.5 rounded"
+                  style={{ background: "var(--accent)" }}
+                />
+              )}
+              <span className="w-4 text-center text-base opacity-90">{item.icon}</span>
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto space-y-2 border-t border-brand-800 px-5 py-4">
-        <span className={`badge ${ambiente.cor}`}>{ambiente.label}</span>
-        <div className="text-xs text-brand-400">Protótipo navegável · v0.1</div>
+      <div
+        className="mt-auto flex flex-col gap-2 border-t px-5 py-4"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <span
+          className="badge"
+          style={{ border: "1px solid var(--border)", color: "var(--muted)" }}
+        >
+          <span
+            className="inline-block h-1.5 w-1.5 rounded-full"
+            style={{ background: "var(--positive)" }}
+          />
+          {ambiente.label}
+        </span>
+        <div className="text-xs" style={{ color: "var(--muted)" }}>
+          Protótipo · v0.2
+        </div>
       </div>
     </aside>
   );

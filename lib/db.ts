@@ -122,3 +122,14 @@ export async function mapaNomesClientes(): Promise<Record<string, string>> {
   const clientes = await getClientes();
   return Object.fromEntries(clientes.map((c) => [c.id, c.nome]));
 }
+
+// Jornada de Boas-vindas: mapa clienteId -> passo atual (1..6, 7 = concluída).
+export async function mapaPassoAtual(): Promise<Record<string, number>> {
+  const sb = getSupabase();
+  if (!sb) {
+    return Object.fromEntries(mock.jornadas.map((j) => [j.clienteId, j.passoAtual]));
+  }
+  const { data, error } = await sb.from("boas_vindas").select("cliente_id, passo_atual");
+  if (error) throw error;
+  return Object.fromEntries((data ?? []).map((r: any) => [r.cliente_id, r.passo_atual]));
+}
